@@ -7,7 +7,14 @@ import {
   DatasetResponse,
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const getBaseUrl = (): string => {
+  if (import.meta.env.PROD) {
+    return import.meta.env.VITE_API_BASE_URL ?? '';
+  }
+  return import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
+};
+
+const API_BASE_URL = getBaseUrl();
 
 class ApiClient {
   private baseUrl: string;
@@ -48,7 +55,8 @@ class ApiClient {
       return (await response.json()) as T;
     } catch (err: any) {
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        throw new Error(`Unable to connect to backend at ${this.baseUrl}. Please verify the server is running.`);
+        const target = this.baseUrl || 'the server';
+        throw new Error(`Unable to connect to backend at ${target}. Please verify the server is running.`);
       }
       throw err;
     }
