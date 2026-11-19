@@ -16,6 +16,8 @@ from app.schemas import (
     TreeResponse,
     DatasetResponse
 )
+from app.routers.tp1_router import router as tp1_router
+from app.routers.tp2_router import router as tp2_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("iris-api")
@@ -42,6 +44,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount TP1 and TP2 routers
+app.include_router(tp1_router)
+app.include_router(tp2_router)
 
 @app.get("/health")
 def health_check():

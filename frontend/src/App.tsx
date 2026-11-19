@@ -16,7 +16,18 @@ import { ScatterPlot } from './components/ScatterPlot';
 import { TreeViewer } from './components/TreeViewer';
 import { MetricsView } from './components/MetricsView';
 import { SettingsModal } from './components/SettingsModal';
-import { Sparkles, GitBranch, BarChart2, ScatterChart as ScatterIcon, AlertCircle } from 'lucide-react';
+import { TP1RegressionView } from './components/TP1RegressionView';
+import { TP2PerceptronView } from './components/TP2PerceptronView';
+import {
+  Sparkles,
+  GitBranch,
+  BarChart2,
+  ScatterChart as ScatterIcon,
+  AlertCircle,
+  TrendingUp,
+  Cpu,
+  Layers
+} from 'lucide-react';
 
 const DEFAULT_INPUTS: PredictRequest = {
   sepal_length: 5.1,
@@ -25,11 +36,18 @@ const DEFAULT_INPUTS: PredictRequest = {
   petal_width: 0.2,
 };
 
+type MainModule = 'tree' | 'tp1' | 'tp2';
+
 export const App: React.FC = () => {
   // Arabic default per requirement
   const [language, setLanguage] = useState<Language>('ar');
   const [isDark, setIsDark] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+
+  // Top level assignment module selector
+  const [activeModule, setActiveModule] = useState<MainModule>('tree');
+
+  // Decision Tree sub-tabs
   const [activeTab, setActiveTab] = useState<'predict' | 'tree' | 'metrics' | 'dataset'>('predict');
 
   const [inputs, setInputs] = useState<PredictRequest>(DEFAULT_INPUTS);
@@ -92,7 +110,6 @@ export const App: React.FC = () => {
         setPrediction(res);
         setIsOnline(true);
       } catch (err: any) {
-        // If predict fails, capture error
         setGlobalError(err.message);
       } finally {
         setLoadingPrediction(false);
@@ -148,112 +165,179 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200/80 dark:border-slate-800">
+        {/* TOP-LEVEL TABS: Decision Tree, TP1 Regression, TP2 Perceptron */}
+        <div className="flex items-center gap-2 p-1.5 bg-slate-200/60 dark:bg-slate-900/80 rounded-2xl border border-slate-300/60 dark:border-slate-800 shadow-inner">
           <button
-            onClick={() => setActiveTab('predict')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm ${
-              activeTab === 'predict'
-                ? 'bg-emerald-600 text-white shadow-emerald-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
+            type="button"
+            onClick={() => setActiveModule('tree')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition shadow-sm ${
+              activeModule === 'tree'
+                ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{t.tabPredict}</span>
+            <Layers className="w-4 h-4 text-emerald-500" />
+            <span>{t.moduleTree}</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('tree')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm ${
-              activeTab === 'tree'
-                ? 'bg-emerald-600 text-white shadow-emerald-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
+            type="button"
+            onClick={() => setActiveModule('tp1')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition shadow-sm ${
+              activeModule === 'tp1'
+                ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <GitBranch className="w-3.5 h-3.5" />
-            <span>{t.tabTree}</span>
-            {prediction && (
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            )}
+            <TrendingUp className="w-4 h-4 text-blue-500" />
+            <span>{t.moduleTP1}</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('metrics')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm ${
-              activeTab === 'metrics'
-                ? 'bg-emerald-600 text-white shadow-emerald-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
+            type="button"
+            onClick={() => setActiveModule('tp2')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition shadow-sm ${
+              activeModule === 'tp2'
+                ? 'bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <BarChart2 className="w-3.5 h-3.5" />
-            <span>{t.tabMetrics}</span>
-            {metrics && (
-              <span className="px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px]">
-                {(metrics.accuracy * 100).toFixed(0)}%
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('dataset')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm ${
-              activeTab === 'dataset'
-                ? 'bg-emerald-600 text-white shadow-emerald-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
-            }`}
-          >
-            <ScatterIcon className="w-3.5 h-3.5" />
-            <span>{t.tabDataset}</span>
+            <Cpu className="w-4 h-4 text-purple-500" />
+            <span>{t.moduleTP2}</span>
           </button>
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'predict' && (
-          <div className="space-y-6 animate-fade-in">
-            <PredictCard
-              language={language}
-              values={inputs}
-              onChange={handleInputChange}
-              onReset={handleResetInputs}
-              prediction={prediction}
-              loading={loadingPrediction}
-            />
+        {/* ========================================================================= */}
+        {/* MODULE 1: DECISION TREE */}
+        {/* ========================================================================= */}
+        {activeModule === 'tree' && (
+          <div className="space-y-6">
+            {/* Navigation Sub-Tabs */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200/80 dark:border-slate-800">
+              <button
+                onClick={() => setActiveTab('predict')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm ${
+                  activeTab === 'predict'
+                    ? 'bg-emerald-600 text-white shadow-emerald-600/20'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{t.tabPredict}</span>
+              </button>
 
-            {dataset && (
-              <ScatterPlot
-                language={language}
-                samples={dataset.samples}
-                currentInput={inputs}
-                predictedSpecies={prediction?.predicted_class || ''}
-              />
+              <button
+                onClick={() => setActiveTab('tree')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm ${
+                  activeTab === 'tree'
+                    ? 'bg-emerald-600 text-white shadow-emerald-600/20'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
+                }`}
+              >
+                <GitBranch className="w-3.5 h-3.5" />
+                <span>{t.tabTree}</span>
+                {prediction && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setActiveTab('metrics')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm ${
+                  activeTab === 'metrics'
+                    ? 'bg-emerald-600 text-white shadow-emerald-600/20'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
+                }`}
+              >
+                <BarChart2 className="w-3.5 h-3.5" />
+                <span>{t.tabMetrics}</span>
+                {metrics && (
+                  <span className="px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px]">
+                    {(metrics.accuracy * 100).toFixed(0)}%
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setActiveTab('dataset')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition shadow-sm ${
+                  activeTab === 'dataset'
+                    ? 'bg-emerald-600 text-white shadow-emerald-600/20'
+                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800'
+                }`}
+              >
+                <ScatterIcon className="w-3.5 h-3.5" />
+                <span>{t.tabDataset}</span>
+              </button>
+            </div>
+
+            {/* Sub-Tab Content */}
+            {activeTab === 'predict' && (
+              <div className="space-y-6 animate-fade-in">
+                <PredictCard
+                  language={language}
+                  values={inputs}
+                  onChange={handleInputChange}
+                  onReset={handleResetInputs}
+                  prediction={prediction}
+                  loading={loadingPrediction}
+                />
+
+                {dataset && (
+                  <ScatterPlot
+                    language={language}
+                    samples={dataset.samples}
+                    currentInput={inputs}
+                    predictedSpecies={prediction?.predicted_class || ''}
+                  />
+                )}
+              </div>
+            )}
+
+            {activeTab === 'tree' && (
+              <div className="animate-fade-in">
+                <TreeViewer
+                  language={language}
+                  treeData={treeData}
+                  highlightedPath={prediction?.decision_path || [0]}
+                />
+              </div>
+            )}
+
+            {activeTab === 'metrics' && (
+              <div className="animate-fade-in">
+                <MetricsView language={language} metrics={metrics} />
+              </div>
+            )}
+
+            {activeTab === 'dataset' && dataset && (
+              <div className="animate-fade-in">
+                <ScatterPlot
+                  language={language}
+                  samples={dataset.samples}
+                  currentInput={inputs}
+                  predictedSpecies={prediction?.predicted_class || ''}
+                />
+              </div>
             )}
           </div>
         )}
 
-        {activeTab === 'tree' && (
+        {/* ========================================================================= */}
+        {/* MODULE 2: TP1 LINEAR REGRESSION */}
+        {/* ========================================================================= */}
+        {activeModule === 'tp1' && (
           <div className="animate-fade-in">
-            <TreeViewer
-              language={language}
-              treeData={treeData}
-              highlightedPath={prediction?.decision_path || [0]}
-            />
+            <TP1RegressionView language={language} />
           </div>
         )}
 
-        {activeTab === 'metrics' && (
+        {/* ========================================================================= */}
+        {/* MODULE 3: TP2 PERCEPTRON FROM SCRATCH */}
+        {/* ========================================================================= */}
+        {activeModule === 'tp2' && (
           <div className="animate-fade-in">
-            <MetricsView language={language} metrics={metrics} />
-          </div>
-        )}
-
-        {activeTab === 'dataset' && dataset && (
-          <div className="animate-fade-in">
-            <ScatterPlot
-              language={language}
-              samples={dataset.samples}
-              currentInput={inputs}
-              predictedSpecies={prediction?.predicted_class || ''}
-            />
+            <TP2PerceptronView language={language} />
           </div>
         )}
       </main>

@@ -88,6 +88,52 @@ class ApiClient {
     return this.request<DatasetResponse>('/dataset');
   }
 
+  // --- TP1 Linear Regression ---
+  async getTP1Diabetes(): Promise<import('../types').RegressionDatasetResponse> {
+    return this.request<import('../types').RegressionDatasetResponse>('/tp1/diabetes');
+  }
+
+  async getTP1Iris(): Promise<import('../types').RegressionDatasetResponse> {
+    return this.request<import('../types').RegressionDatasetResponse>('/tp1/iris-regression');
+  }
+
+  async predictDiabetes(data: import('../types').PredictDiabetesRequest): Promise<import('../types').PredictDiabetesResponse> {
+    return this.request<import('../types').PredictDiabetesResponse>('/tp1/predict-diabetes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async predictIrisSepal(data: import('../types').PredictIrisSepalRequest): Promise<import('../types').PredictIrisSepalResponse> {
+    return this.request<import('../types').PredictIrisSepalResponse>('/tp1/predict-iris-sepal', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // --- TP2 Perceptron ---
+  async getTP2Binary(): Promise<import('../types').PerceptronResponse> {
+    return this.request<import('../types').PerceptronResponse>('/tp2/binary');
+  }
+
+  async getTP2Multiclass(useAllFeatures: boolean = false): Promise<import('../types').PerceptronResponse> {
+    return this.request<import('../types').PerceptronResponse>(`/tp2/multiclass?use_all_features=${useAllFeatures}`);
+  }
+
+  async retrainPerceptron(data: import('../types').RetrainPerceptronRequest): Promise<import('../types').PerceptronResponse> {
+    return this.request<import('../types').PerceptronResponse>('/tp2/retrain', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async predictPerceptron(data: import('../types').PredictPerceptronRequest): Promise<import('../types').PredictPerceptronResponse> {
+    return this.request<import('../types').PredictPerceptronResponse>('/tp2/predict', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   async checkHealth(): Promise<{ status: string }> {
     return this.request<{ status: string }>('/health');
   }
