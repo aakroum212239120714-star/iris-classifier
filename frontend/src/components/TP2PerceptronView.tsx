@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Language, PerceptronResponse, PredictPerceptronRequest, PredictPerceptronResponse } from '../types';
 import { apiClient } from '../api/client';
 import { translations } from '../i18n/translations';
-import { TheoryPanel } from './TheoryPanel';
 import {
   Cpu,
   Sliders,
@@ -578,9 +577,6 @@ export const TP2PerceptronView: React.FC<TP2PerceptronViewProps> = ({ language }
           </div>
         </form>
       </div>
-
-      {/* Assignment Theory Panel */}
-      <TheoryPanel language={language} topic="tp2" />
     </div>
   );
 };

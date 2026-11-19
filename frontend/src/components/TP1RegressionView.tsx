@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Language, RegressionDatasetResponse, PredictDiabetesRequest, PredictIrisSepalRequest } from '../types';
 import { apiClient } from '../api/client';
 import { translations } from '../i18n/translations';
-import { TheoryPanel } from './TheoryPanel';
 import {
   TrendingUp,
   Table,
@@ -494,9 +493,6 @@ export const TP1RegressionView: React.FC<TP1RegressionViewProps> = ({ language }
           </form>
         )}
       </div>
-
-      {/* Assignment Theory Panel */}
-      <TheoryPanel language={language} topic="tp1" />
     </div>
   );
 };
